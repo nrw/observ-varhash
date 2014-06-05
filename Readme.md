@@ -49,7 +49,7 @@ console.log(people())
 
  - Nicholas Westlake
 
-Based heavily on `[observ-struct](https://github.com/Raynos/observ-struct)`
+Based heavily on [`observ-struct`](https://github.com/Raynos/observ-struct)
 
 ## MIT Licenced
 
