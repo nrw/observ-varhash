@@ -85,6 +85,28 @@ test('add key', function (assert) {
   assert.end()
 })
 
+test('emits change for added key', function (assert) {
+  var obj = ObservVarhash({ foo: Observ('foo') })
+  var changes = []
+
+  obj(function (state) {
+    changes.push(state)
+  })
+
+  obj.put('bar', Observ('bar'))
+  obj.get('bar').set('baz')
+
+  assert.equal(changes.length, 2)
+  assert.deepEqual(changes[0], {
+    foo: 'foo', bar: 'bar', _diff: { 'bar': 'bar' }
+  })
+
+  assert.deepEqual(obj(), {
+    foo: 'foo', bar: 'baz', _diff: { 'bar': 'baz' }
+  })
+  assert.end()
+})
+
 test('remove key', function (assert) {
   var obj = ObservVarhash({
     foo: Observ('foo'),
@@ -96,8 +118,11 @@ test('remove key', function (assert) {
     changes.push(state)
   })
 
+  assert.equal(Object.keys(obj._removeListeners).length, 2)
+
   obj.delete('foo')
 
+  assert.equal(Object.keys(obj._removeListeners).length, 1)
   assert.equal(changes.length, 1)
   assert.deepEqual(changes[0], {
     bar: 'bar', _diff: { 'foo': ObservVarhash.Tombstone }
