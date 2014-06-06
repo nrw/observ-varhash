@@ -1,4 +1,4 @@
-# observ-varhash
+# observ-varhash [![build status][1]][2]
 
 <!--
     [![build status][1]][2]
