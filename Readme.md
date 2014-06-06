@@ -23,19 +23,11 @@ An `ObservVarhash` is a version of `observ-struct` that allows
 var ObservVarhash = require("observ-varhash")
 var Observ = require("observ")
 
-var people = ObservVarhash({
-  jack: Observ('Jack')
+var people = ObservVarhash({jack: 'Jack'}, function create (obj, key) {
+  return Observe(obj)
 })
 
-state(function (currState) {
-  // currState.todos is a plain javascript todo
-  // currState.todos[0] is a plain javascript value
-  currState.todos.forEach(function (todo, index) {
-    console.log("todo", todo.title, index)
-  })
-})
-
-people.put('diane', Observe('Diane'))
+people.put('diane', 'Diane')
 
 console.log(people())
 // plain javascript object {jack: 'Jack', diane: 'Diane'}
