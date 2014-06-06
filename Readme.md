@@ -10,7 +10,7 @@
 
 <!-- [![browser support][11]][12] -->
 
-An array containing observable values
+An object with observable key value pairs that can be added and removed
 
 ## Example
 
