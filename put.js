@@ -1,16 +1,22 @@
-var extend = require("xtend")
+var extend = require('xtend')
 
 module.exports = put
 
-function put (key, value) {
-  var obs = this
-  var modified = obs()
+function put (create) {
+  return function (key, val) {
+    var obs = this
+    var state = extend(obs())
+    var value = create(val, key)
 
-  var diff = {}
-  diff[key] = value()
+    value = typeof value === 'function' ? value() : value
 
-  modified._diff = diff
+    state[key] = value
+    var diff = {}
 
-  obs.set(extend(modified, diff))
-  return obs
+    diff[key] = value && value._diff ? value._diff : value
+
+    state._diff = diff
+    obs.set(state)
+    return obs
+  }
 }

@@ -1,39 +1,43 @@
-var Observ = require("observ")
-var extend = require("xtend")
-var put = require("./put")
-var del = require("./del")
+var Observ = require('observ')
+var extend = require('xtend')
+var put = require('./put')
+var del = require('./del')
 
 module.exports = ObservVarhash
 
-function ObservVarhash(hash) {
+ObservVarhash.Tombstone = require('./tombstone')
+
+function ObservVarhash(hash, createFn) {
+  createFn = createFn || function (obj) { return obj }
   var keys = Object.keys(hash)
 
   var initialState = {}
 
   keys.forEach(function (key) {
-    if (key === "name") {
-      throw new Error("cannot create an observ-varhash " +
-        "with a key named 'name'. Clashes with " +
-        "`Function.prototype.name`.");
+    if (key === 'name') {
+      throw new Error('cannot create an observ-varhash ' +
+        'with a key named "name". Clashes with ' +
+        '`Function.prototype.name`.');
     }
 
     var observ = hash[key]
-    initialState[key] = typeof observ === "function" ? observ() : observ
+    initialState[key] = typeof observ === 'function' ? observ() : observ
   })
 
   var obs = Observ(initialState)
 
   obs.get = get
-  obs.put = put
+  obs.put = put(createFn)
   obs.delete = del
 
-  obs._hash = hash
+  // obs._hash = hash
+  // console.log('-------------')
 
   keys.forEach(function (key) {
     var observ = hash[key]
-    obs[key] = observ
+    obs[key] = createFn(observ, key)
 
-    if (typeof observ === "function") {
+    if (typeof observ === 'function') {
       observ(function (value) {
         var state = extend(obs())
         state[key] = value

@@ -9,10 +9,19 @@ test('ObservVarhash is a function', function (assert) {
 })
 
 test('ObservVarhash contains correct initial value', function (assert) {
-  var obj = ObservVarhash({
-    foo: Observ('foo'),
-    bar: Observ('bar')
+  var obj = ObservVarhash({foo: 'foo', bar: 'bar'}, function (obj, key) {
+    return Observ(obj)
   })
+
+  var state = obj()
+  assert.equal(state.foo, 'foo')
+  assert.equal(state.bar, 'bar')
+
+  assert.end()
+})
+
+test('works without create fn', function (assert) {
+  var obj = ObservVarhash({foo: 'foo', bar: 'bar'})
 
   var state = obj()
   assert.equal(state.foo, 'foo')
@@ -91,11 +100,11 @@ test('remove key', function (assert) {
 
   assert.equal(changes.length, 1)
   assert.deepEqual(changes[0], {
-    bar: 'bar', _diff: { 'foo': null }
+    bar: 'bar', _diff: { 'foo': ObservVarhash.Tombstone }
   })
 
   assert.deepEqual(obj(), {
-    bar: 'bar', _diff: { 'foo': null }
+    bar: 'bar', _diff: { 'foo': ObservVarhash.Tombstone }
   })
   assert.end()
 })

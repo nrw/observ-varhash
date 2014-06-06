@@ -1,3 +1,5 @@
+var Tombstone = require('./tombstone')
+
 module.exports = del
 
 function del (key) {
@@ -7,7 +9,7 @@ function del (key) {
   delete modified[key]
 
   var diff = {}
-  diff[key] = null
+  diff[key] = Tombstone
 
   modified._diff = diff
 
