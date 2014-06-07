@@ -1,8 +1,8 @@
 language: node_js
 node_js:
-  - "0.8"
   - "0.10"
 before_script:
  - npm install
- - npm install istanbul coveralls
+ - npm install istanbul coveralls coffee-script
+ - npm run build
 script: npm run travis-test
