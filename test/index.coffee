@@ -316,3 +316,16 @@ test 'throws for keys that hide api', (t) ->
   t.doesNotThrow -> obj.put 'baz', {baz: 'baz'}
 
   t.end()
+
+test 'Tombstone is Tombstone', (t) ->
+  obj = ObservVarhash {foo: 'foo', bar: 'bar'}
+
+  i = 0
+  obj (change) ->
+    return i++ unless i > 1
+    t.equal change._diff.foo, ObservVarhash.Tombstone
+    t.end()
+
+  obj.delete 'foo'
+  obj.put 'foo', 'hi'
+  obj.delete 'foo'

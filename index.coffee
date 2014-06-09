@@ -79,8 +79,9 @@ getKeyError = (key) ->
 
 # mark deletes
 Tombstone = ->
-  @toString = -> '[object Tombstone]'
-  @toJSON = -> '[object Tombstone]'
+Tombstone::toString = -> '[object Tombstone]'
+Tombstone::toJSON = -> '[object Tombstone]'
+Tombstone::inspect = -> '[object Tombstone]'
 
 ObservVarhash.Tombstone = new Tombstone()
 
