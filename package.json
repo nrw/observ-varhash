@@ -17,12 +17,12 @@
     "email": "nicholasredlin@gmail.com"
   },
   "dependencies": {
-    "xtend": "~2.1.2",
-    "observ": "~0.1.5"
+    "xtend": "~3.0.0",
+    "observ": "~0.2.0"
   },
   "devDependencies": {
-    "observ-struct": "~3.1.0",
-    "tape": "~2.5.0"
+    "observ-struct": "~4.0.0",
+    "tape": "~2.13.0"
   },
   "licenses": [
     {
@@ -32,8 +32,6 @@
   "scripts": {
     "test": "node ./test/index.js",
     "start": "node ./index.js",
-    "build": "coffee -c .",
-    "watch": "coffee -w -c -o . .",
     "travis-test": "istanbul cover ./test/index.js && ((cat coverage/lcov.info | coveralls) || exit 0)",
     "cover": "istanbul cover --report none --print detail ./test/index.js",
     "view-cover": "istanbul report html && google-chrome ./coverage/index.html",
