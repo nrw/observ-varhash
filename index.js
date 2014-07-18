@@ -71,7 +71,7 @@ function put (createValue, key, val) {
   this._removeListeners[key] = isFn(observ) ?
     observ(watch(this, key)) : null
 
-  state._diff = diff(key, state[key])
+  setNonEnumerable(state, '_diff', diff(key, state[key]))
 
   this.set(state)
   this[key] = observ
@@ -88,8 +88,7 @@ function del (key) {
   delete this._removeListeners[key]
   delete state[key]
 
-  state._diff = diff(key, ObservVarhash.Tombstone)
-
+  setNonEnumerable(state, '_diff', diff(key, ObservVarhash.Tombstone))
   this.set(state)
 
   return this
@@ -100,7 +99,8 @@ function watch (obs, key, currentTransaction) {
   return function (value) {
     var state = extend(obs())
     state[key] = value
-    state._diff = diff(key, value)
+
+    setNonEnumerable(state, '_diff', diff(key, value))
     currentTransaction = state
     obs.set(state)
     currentTransaction = NO_TRANSACTION
@@ -115,6 +115,15 @@ function diff (key, value) {
 
 function isFn (obj) {
   return typeof obj === 'function'
+}
+
+function setNonEnumerable(object, key, value) {
+  Object.defineProperty(object, key, {
+    value: value,
+    writable: true,
+    configurable: true,
+    enumerable: false
+  })
 }
 
 // errors

@@ -47,9 +47,13 @@ test('observ emits change', function (t) {
   obj.bar.set('bar2')
 
   t.equal(changes.length, 3)
-  t.same(changes[0], {foo: 'foo', bar: 'bar', _diff: {foo: 'foo'}})
-  t.same(changes[1], {foo: 'foo2', bar: 'bar', _diff: {foo: 'foo2'}})
-  t.same(changes[2], {foo: 'foo2', bar: 'bar2', _diff: {bar: 'bar2'}})
+  t.same(changes[0], {foo: 'foo', bar: 'bar'})
+  t.same(changes[1], {foo: 'foo2', bar: 'bar'})
+  t.same(changes[2], {foo: 'foo2', bar: 'bar2'})
+
+  t.same(changes[0]._diff, {foo: 'foo'})
+  t.same(changes[1]._diff, {foo: 'foo2'})
+  t.same(changes[2]._diff, {bar: 'bar2'})
 
   t.notEqual(changes[0], changes[1])
   t.notEqual(changes[1], changes[2])
@@ -71,8 +75,10 @@ test('add key', function (t) {
   obj.put('baz', Observ('baz'))
 
   t.equal(changes.length, 1)
-  t.same(changes[0], {foo: 'foo', bar: 'bar', baz: 'baz', _diff: {baz: 'baz'}})
-  t.same(obj(), {foo: 'foo', bar: 'bar', baz: 'baz', _diff: {baz: 'baz'}})
+  t.same(changes[0], {foo: 'foo', bar: 'bar', baz: 'baz'})
+  t.same(obj(), {foo: 'foo', bar: 'bar', baz: 'baz'})
+  t.same(changes[0]._diff, {baz: 'baz'})
+  t.same(obj()._diff, {baz: 'baz'})
 
   t.end()
 })
@@ -89,8 +95,10 @@ test('emits change for added key', function (t) {
   obj.get('bar').set('baz')
 
   t.equal(changes.length, 2)
-  t.same(changes[0], {foo: 'foo', bar: 'bar', _diff: {bar: 'bar'}})
-  t.same(obj(), {foo: 'foo', bar: 'baz', _diff: {bar: 'baz'}})
+  t.same(changes[0], {foo: 'foo', bar: 'bar'})
+  t.same(changes[0]._diff, {bar: 'bar'})
+  t.same(obj(), {foo: 'foo', bar: 'baz'})
+  t.same(obj()._diff, {bar: 'baz'})
 
   t.end()
 })
@@ -113,8 +121,10 @@ test('remove key', function (t) {
   t.equal(Object.keys(obj._removeListeners).length, 1)
   t.equal(changes.length, 1)
 
-  t.same(changes[0], {bar: 'bar', _diff: {foo: ObservVarhash.Tombstone}})
-  t.same(obj(), {bar: 'bar', _diff: {foo: ObservVarhash.Tombstone}})
+  t.same(changes[0], {bar: 'bar'})
+  t.same(changes[0]._diff, {foo: ObservVarhash.Tombstone})
+  t.same(obj(), {bar: 'bar'})
+  t.same(obj()._diff, {foo: ObservVarhash.Tombstone})
 
   t.end()
 })
@@ -140,7 +150,6 @@ test('works with nested things', function (t) {
     }),
     customers: Observ(5)
   })
-
   var initialState = obj()
   var changes = []
   var fruitChanges = []
@@ -159,149 +168,50 @@ test('works with nested things', function (t) {
 
   t.equal(changes.length, 3)
   t.equal(fruitChanges.length, 2)
+
   t.notEqual(changes[0], initialState)
   t.notEqual(changes[1], changes[0])
   t.notEqual(changes[2], changes[1])
+
   t.notEqual(fruitChanges[0], initialState.fruits)
   t.notEqual(fruitChanges[1], fruitChanges[0])
 
   t.same(initialState, {
     customers: 5,
-    fruits: {
-      apples: 3,
-      oranges: 5
-    }
+    fruits: {apples: 3, oranges: 5}
   })
+
   t.same(changes[0], {
     customers: 5,
-    fruits: {
-      apples: 3,
-      oranges: 6,
-      _diff: {oranges: 6}
-    },
-    _diff: {fruits: {oranges: 6}}
+    fruits: {apples: 3, oranges: 6}
   })
+  t.same(changes[0]._diff, {fruits: {oranges: 6}})
+  t.same(changes[0].fruits._diff, {'oranges': 6})
   t.same(changes[1], {
     customers: 10,
-    _diff: {customers: 10},
-    fruits: {
-      apples: 3,
-      oranges: 6,
-      _diff: {oranges: 6}
-    }
+    fruits: {apples: 3, oranges: 6}
   })
+  t.same(changes[1]._diff, {customers: 10})
+  t.same(changes[1].fruits._diff, {oranges: 6})
   t.same(changes[2], {
     customers: 10,
-    _diff: {fruits: {apples: 4}},
-    fruits: {
-      apples: 4,
-      oranges: 6,
-      _diff: {apples: 4}
-    }
+    fruits: {apples: 4, oranges: 6}
   })
+  t.same(changes[2]._diff, {fruits: {apples: 4}})
+  t.same(changes[2].fruits._diff, {apples: 4})
+
   t.same(initialState.fruits, {
-    apples: 3,
-    oranges: 5
+    apples: 3, oranges: 5
   })
   t.same(fruitChanges[0], {
-    apples: 3,
-    oranges: 6,
-    _diff: {oranges: 6}
+    apples: 3, oranges: 6
   })
+  t.same(fruitChanges[0]._diff, {oranges: 6})
   t.same(fruitChanges[1], {
-    apples: 4,
-    oranges: 6,
-    _diff: {apples: 4}
+    apples: 4, oranges: 6
   })
-  t.equal(changes[1].fruits, changes[0].fruits,
-    'unchanged properties are the same value')
+  t.same(fruitChanges[1]._diff, {apples: 4})
 
-  t.end()
-})
-
-test('emits nested change', function (t) {
-  var obj = ObservStruct({
-    fruits: ObservVarhash({
-      apples: 3,
-      oranges: 5
-    }, function (val, key) {
-      return Observ(val)
-    }),
-    customers: Observ(5)
-  })
-
-  var initialState = obj()
-  var changes = []
-  var fruitChanges = []
-
-  obj(function (state) {
-    changes.push(state)
-  })
-
-  obj.fruits(function (state) {
-    fruitChanges.push(state)
-  })
-
-  obj.fruits.oranges.set(6)
-  obj.customers.set(10)
-  obj.fruits.apples.set(4)
-
-  t.equal(changes.length, 3)
-  t.equal(fruitChanges.length, 2)
-  t.notEqual(changes[0], initialState)
-  t.notEqual(changes[1], changes[0])
-  t.notEqual(changes[2], changes[1])
-  t.notEqual(fruitChanges[0], initialState.fruits)
-  t.notEqual(fruitChanges[1], fruitChanges[0])
-
-  t.same(initialState, {
-    customers: 5,
-    fruits: {
-      apples: 3,
-      oranges: 5
-    }
-  })
-  t.same(changes[0], {
-    customers: 5,
-    fruits: {
-      apples: 3,
-      oranges: 6,
-      _diff: {oranges: 6}
-    },
-    _diff: {fruits: {oranges: 6}}
-  })
-  t.same(changes[1], {
-    customers: 10,
-    _diff: {customers: 10},
-    fruits: {
-      apples: 3,
-      oranges: 6,
-      _diff: {oranges: 6}
-    }
-  })
-  t.same(changes[2], {
-    customers: 10,
-    _diff: {fruits: {apples: 4}},
-    fruits: {
-      apples: 4,
-      oranges: 6,
-      _diff: {apples: 4}
-    }
-  })
-  t.same(initialState.fruits, {
-    apples: 3,
-    oranges: 5
-  })
-  t.same(fruitChanges[0], {
-    apples: 3,
-    oranges: 6,
-    _diff: {oranges: 6}
-  })
-  t.same(fruitChanges[1], {
-    apples: 4,
-    oranges: 6,
-    _diff: {apples: 4}
-  })
   t.equal(changes[1].fruits, changes[0].fruits,
     'unchanged properties are the same value')
 
@@ -391,19 +301,6 @@ test('two way data binding doesnt emit twice', function (t) {
 
   t.equal(values.length, 1)
   t.equal(values[0], 'bar2')
-
-  t.end()
-})
-
-test('overwrites full data set', function (t) {
-  var obs = ObservVarhash({
-    foo: Observ('bar')
-  })
-
-  obs.set({bar: 'bar3'})
-  obs.set({bar: 'bar3'})
-
-  t.same(obs(), {bar: 'bar3'})
 
   t.end()
 })
