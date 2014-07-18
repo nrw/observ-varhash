@@ -16,7 +16,7 @@ function ObservVarhash (hash, createValue) {
   for (var key in hash) {
     var observ = hash[key]
     checkKey(key)
-    initialState[key] = isFunc(observ) ? observ() : observ
+    initialState[key] = isFn(observ) ? observ() : observ
   }
 
   var obs = Observ(initialState)
@@ -29,7 +29,7 @@ function ObservVarhash (hash, createValue) {
   for (key in hash) {
     obs[key] = createValue(hash[key], key)
 
-    if (isFunc(obs[key])) {
+    if (isFn(obs[key])) {
       obs._removeListeners[key] = obs[key](watch(obs, key, currentTransaction))
     }
   }
@@ -42,7 +42,7 @@ function ObservVarhash (hash, createValue) {
     for (var key in hash) {
       var observ = hash[key]
 
-      if (isFunc(observ) && observ() !== newState[key]) {
+      if (isFn(observ) && observ() !== newState[key]) {
         observ.set(newState[key])
       }
     }
@@ -62,13 +62,13 @@ function put (createValue, key, val) {
   var observ = createValue(val, key)
   var state = extend(this())
 
-  state[key] = isFunc(observ) ? observ() : observ
+  state[key] = isFn(observ) ? observ() : observ
 
-  if (isFunc(this._removeListeners[key])) {
+  if (isFn(this._removeListeners[key])) {
     this._removeListeners[key]()
   }
 
-  this._removeListeners[key] = isFunc(observ) ?
+  this._removeListeners[key] = isFn(observ) ?
     observ(watch(this, key)) : null
 
   state._diff = diff(key, state[key])
@@ -81,7 +81,7 @@ function put (createValue, key, val) {
 
 function del (key) {
   var state = extend(this())
-  if (isFunc(this._removeListeners[key])) {
+  if (isFn(this._removeListeners[key])) {
     this._removeListeners[key]()
   }
 
@@ -113,7 +113,7 @@ function diff (key, value) {
   return obj
 }
 
-function isFunc (obj) {
+function isFn (obj) {
   return typeof obj === 'function'
 }
 
