@@ -107,14 +107,14 @@ function checkKey (key) {
 function getKeyError (key) {
   switch (key) {
     case 'name': {
-      return format(key, 'Clashes with `Function.prototype.name`.')
+      return formatError(key, 'Clashes with `Function.prototype.name`.')
     }
     case 'get':
     case 'put':
     case 'delete':
     case '_diff':
     case '_removeListeners': {
-      return format(key, 'Clashes with observ-varhash method')
+      return formatError(key, 'Clashes with observ-varhash method')
     }
     default: {
       return ''
