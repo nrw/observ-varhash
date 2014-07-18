@@ -1,6 +1,8 @@
 var Observ = require('observ')
 var extend = require('xtend')
 
+var NO_TRANSACTION = {}
+
 ObservVarhash.Tombstone = new Tombstone()
 
 module.exports = ObservVarhash
@@ -9,6 +11,7 @@ function ObservVarhash (hash, createValue) {
   createValue = createValue || function (obj) { return obj }
 
   var initialState = {}
+  var currentTransaction = NO_TRANSACTION
 
   for (var key in hash) {
     var observ = hash[key]
@@ -28,9 +31,24 @@ function ObservVarhash (hash, createValue) {
     obs[key] = createValue(hash[key], key)
 
     if (isFunc(obs[key])) {
-      obs._removeListeners[key] = obs[key](watch(obs, key))
+      obs._removeListeners[key] = obs[key](watch(obs, key, currentTransaction))
     }
   }
+
+  obs(function (newState) {
+    if (currentTransaction === newState) {
+      return
+    }
+
+    for (var key in hash) {
+      var observ = hash[key]
+
+      if (isFunc(observ) && observ() !== newState[key]) {
+        observ.set(newState[key])
+      }
+    }
+  })
+
   return obs
 }
 
@@ -81,12 +99,14 @@ function methods (createValue) {
   }
 }
 
-function watch (obs, key) {
+function watch (obs, key, currentTransaction) {
   return function (value) {
     var state = extend(obs())
     state[key] = value
     state._diff = diff(key, value)
-    return obs.set(state)
+    currentTransaction = state
+    obs.set(state)
+    currentTransaction = NO_TRANSACTION
   }
 }
 

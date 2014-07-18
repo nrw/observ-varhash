@@ -347,3 +347,63 @@ test('Tombstone is Tombstone', function (t) {
   obj.put('foo', 'hi')
   obj.delete('foo')
 })
+
+test('observ varhash with black list', function (t) {
+  t.throws(function () {
+    ObservVarhash({
+      name: Observ('foo')
+    })
+  }, /cannot create/)
+
+  t.end()
+})
+
+test('supports two way data binding', function (t) {
+  var obs = ObservVarhash({
+    foo: Observ('bar')
+  })
+
+  obs.foo.set('bar2')
+
+  t.equal(obs().foo, 'bar2')
+  t.equal(obs.foo(), 'bar2')
+
+  obs.set({foo: 'bar3'})
+
+  t.equal(obs().foo, 'bar3')
+  t.equal(obs.foo(), 'bar3')
+
+  t.end()
+})
+
+test('two way data binding doesnt emit twice', function (t) {
+  var obs = ObservVarhash({
+    foo: Observ('bar')
+  })
+
+  var values = []
+  obs.foo(function (v) {
+    values.push(v)
+  })
+
+  obs.set({foo: 'bar2'})
+  obs.set({foo: 'bar2'})
+
+  t.equal(values.length, 1)
+  t.equal(values[0], 'bar2')
+
+  t.end()
+})
+
+test('overwrites full data set', function (t) {
+  var obs = ObservVarhash({
+    foo: Observ('bar')
+  })
+
+  obs.set({bar: 'bar3'})
+  obs.set({bar: 'bar3'})
+
+  t.same(obs(), {bar: 'bar3'})
+
+  t.end()
+})
