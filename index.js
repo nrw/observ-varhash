@@ -22,10 +22,9 @@ function ObservVarhash (hash, createValue) {
   var obs = Observ(initialState)
   obs._removeListeners = {}
 
-  var actions = methods(createValue)
-  for (var k in actions) {
-    obs[k] = actions[k]
-  }
+  obs.get = get.bind(obs)
+  obs.put = put.bind(obs, createValue)
+  obs.delete = del.bind(obs)
 
   for (key in hash) {
     obs[key] = createValue(hash[key], key)
@@ -52,53 +51,51 @@ function ObservVarhash (hash, createValue) {
   return obs
 }
 
-function methods (createValue) {
-  return {
-    get: function (key) {
-      return this[key]
-    },
-
-    put: function (key, val) {
-      checkKey(key)
-
-      var observ = createValue(val, key)
-      var state = extend(this())
-
-      state[key] = isFunc(observ) ? observ() : observ
-
-      if (isFunc(this._removeListeners[key])) {
-        this._removeListeners[key]()
-      }
-
-      this._removeListeners[key] = isFunc(observ) ?
-        observ(watch(this, key)) : null
-
-      state._diff = diff(key, state[key])
-
-      this.set(state)
-      this[key] = observ
-
-      return this
-    },
-
-    'delete': function (key) {
-      var state = extend(this())
-      if (isFunc(this._removeListeners[key])) {
-        this._removeListeners[key]()
-      }
-
-      delete this._removeListeners[key]
-      delete state[key]
-
-      state._diff = diff(key, ObservVarhash.Tombstone)
-
-      this.set(state)
-
-      return this
-    }
-  }
+// access and mutate
+function get (key) {
+  return this[key]
 }
 
+function put (createValue, key, val) {
+  checkKey(key)
+
+  var observ = createValue(val, key)
+  var state = extend(this())
+
+  state[key] = isFunc(observ) ? observ() : observ
+
+  if (isFunc(this._removeListeners[key])) {
+    this._removeListeners[key]()
+  }
+
+  this._removeListeners[key] = isFunc(observ) ?
+    observ(watch(this, key)) : null
+
+  state._diff = diff(key, state[key])
+
+  this.set(state)
+  this[key] = observ
+
+  return this
+}
+
+function del (key) {
+  var state = extend(this())
+  if (isFunc(this._removeListeners[key])) {
+    this._removeListeners[key]()
+  }
+
+  delete this._removeListeners[key]
+  delete state[key]
+
+  state._diff = diff(key, ObservVarhash.Tombstone)
+
+  this.set(state)
+
+  return this
+}
+
+// processing
 function watch (obs, key, currentTransaction) {
   return function (value) {
     var state = extend(obs())
@@ -116,38 +113,25 @@ function diff (key, value) {
   return obj
 }
 
-function checkKey (key) {
-  var msg = getKeyError(key)
-
-  if (msg) {
-    throw new Error(msg)
-  }
-}
-
-function getKeyError (key) {
-  switch (key) {
-    case 'name': {
-      return formatError(key, 'Clashes with `Function.prototype.name`.')
-    }
-    case 'get':
-    case 'put':
-    case 'delete':
-    case '_diff':
-    case '_removeListeners': {
-      return formatError(key, 'Clashes with observ-varhash method')
-    }
-    default: {
-      return ''
-    }
-  }
-}
-
-function formatError (key, reason) {
-  return 'cannot create an observ-varhash with key `' + key + '`, ' + reason
-}
-
 function isFunc (obj) {
   return typeof obj === 'function'
+}
+
+// errors
+function checkKey (key) {
+  if (!blacklist[key]) return
+  throw new Error(
+    'cannot create an observ-varhash with key `' + key + '`. ' + blacklist[key]
+  )
+}
+
+var blacklist = {
+  name: 'Clashes with `Function.prototype.name`.',
+  get: 'get is a reserved key of observ-varhash method',
+  put: 'put is a reserved key of observ-varhash method',
+  delete: 'delete is a reserved key of observ-varhash method',
+  _diff: '_diff is a reserved key of observ-varhash method',
+  _removeListeners: '_removeListeners is a reserved key of observ-varhash'
 }
 
 // identify deletes
