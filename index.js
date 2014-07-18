@@ -118,13 +118,6 @@ function isFunc (obj) {
 }
 
 // errors
-function checkKey (key) {
-  if (!blacklist[key]) return
-  throw new Error(
-    'cannot create an observ-varhash with key `' + key + '`. ' + blacklist[key]
-  )
-}
-
 var blacklist = {
   name: 'Clashes with `Function.prototype.name`.',
   get: 'get is a reserved key of observ-varhash method',
@@ -132,6 +125,13 @@ var blacklist = {
   delete: 'delete is a reserved key of observ-varhash method',
   _diff: '_diff is a reserved key of observ-varhash method',
   _removeListeners: '_removeListeners is a reserved key of observ-varhash'
+}
+
+function checkKey (key) {
+  if (!blacklist[key]) return
+  throw new Error(
+    'cannot create an observ-varhash with key `' + key + '`. ' + blacklist[key]
+  )
 }
 
 // identify deletes
