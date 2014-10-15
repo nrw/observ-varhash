@@ -129,6 +129,21 @@ test('remove key', function (t) {
   t.end()
 })
 
+test('delete', function (t) {
+  var obj = ObservVarhash({
+    foo: ObservStruct({
+      baz: 'baz'
+    }),
+    bar: Observ('bar')
+  })
+
+  t.same(obj.get('foo')(), {baz: 'baz'})
+  obj.delete('foo')
+  t.same(obj.get('foo'), undefined)
+
+  t.end()
+})
+
 test('supports both observs and values', function (t) {
   var obj = ObservVarhash({
     foo: Observ('foo'),

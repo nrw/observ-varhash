@@ -87,6 +87,7 @@ function del (key) {
 
   delete this._removeListeners[key]
   delete state[key]
+  delete this[key]
 
   setNonEnumerable(state, '_diff', diff(key, ObservVarhash.Tombstone))
   this.set(state)
