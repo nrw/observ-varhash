@@ -20,11 +20,11 @@ function ObservVarhash (hash, createValue) {
   }
 
   var obs = Observ(initialState)
-  obs._removeListeners = {}
+  setNonEnumerable(obs, '_removeListeners', {})
 
-  obs.get = get.bind(obs)
-  obs.put = put.bind(obs, createValue)
-  obs.delete = del.bind(obs)
+  setNonEnumerable(obs, 'get', get.bind(obs))
+  setNonEnumerable(obs, 'put', put.bind(obs, createValue))
+  setNonEnumerable(obs, 'delete', del.bind(obs))
 
   for (key in hash) {
     obs[key] = createValue(hash[key], key)
