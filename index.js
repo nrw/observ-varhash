@@ -13,18 +13,9 @@ function ObservVarhash (hash, createValue) {
   var initialState = {}
   var currentTransaction = NO_TRANSACTION
 
-  for (var key in hash) {
-    var observ = hash[key]
-    checkKey(key)
-    initialState[key] = isFn(observ) ? observ() : observ
-  }
-
-  var obs = Observ(initialState)
+  var obs = Observ()
   obs._removeListeners = {}
-
-  obs.get = get.bind(obs)
-  obs.put = put.bind(obs, createValue)
-  obs.delete = del.bind(obs)
+  var key
 
   for (key in hash) {
     obs[key] = createValue(hash[key], key)
@@ -33,6 +24,22 @@ function ObservVarhash (hash, createValue) {
       obs._removeListeners[key] = obs[key](watch(obs, key, currentTransaction))
     }
   }
+
+  for (key in hash) {
+    var observ = obs[key]
+    checkKey(key)
+    initialState[key] = isFn(observ) ? observ() : observ
+  }
+
+  currentTransaction = initialState
+  obs.set(initialState)
+  currentTransaction = NO_TRANSACTION
+
+
+  obs.get = get.bind(obs)
+  obs.put = put.bind(obs, createValue)
+  obs.delete = del.bind(obs)
+
 
   obs(function (newState) {
     if (currentTransaction === newState) {
