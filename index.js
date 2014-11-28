@@ -27,7 +27,8 @@ function ObservVarhash (hash, createValue) {
   obs.delete = del.bind(obs)
 
   for (key in hash) {
-    obs[key] = createValue(hash[key], key)
+    obs[key] = typeof hash[key] === 'function' ?
+      hash[key] : createValue(hash[key], key)
 
     if (isFn(obs[key])) {
       obs._removeListeners[key] = obs[key](watch(obs, key, currentTransaction))
@@ -59,7 +60,8 @@ function get (key) {
 function put (createValue, key, val) {
   checkKey(key)
 
-  var observ = createValue(val, key)
+  var observ = typeof observ === 'function' ?
+    createValue(val, key) : val
   var state = extend(this())
 
   state[key] = isFn(observ) ? observ() : observ
@@ -145,7 +147,9 @@ function checkKey (key) {
 }
 
 // identify deletes
-function Tombstone () {}
+function Tombstone () {
+  
+}
 
 Tombstone.prototype.toJSON = nameTombstone
 Tombstone.prototype.inspect = nameTombstone
