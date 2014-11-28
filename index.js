@@ -56,6 +56,10 @@ function get (key) {
 
 function put (createValue, key, val) {
   checkKey(key)
+  
+  if (val === undefined) {
+    throw new Error('cannot varhash.put(key, undefined).')
+  }
 
   var observ = createValue(val, key)
   var state = extend(this())
