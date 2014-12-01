@@ -14,7 +14,7 @@ var ObservVarhash = require("observ-varhash")
 var Observ = require("observ")
 
 var people = ObservVarhash({jack: 'Jack'}, function create (obj, key) {
-  return Observe(obj)
+  return Observ(obj)
 })
 
 people.put('diane', 'Diane')
