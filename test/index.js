@@ -122,9 +122,9 @@ test('remove key', function (t) {
   t.equal(changes.length, 1)
 
   t.same(changes[0], {bar: 'bar'})
-  t.same(changes[0]._diff, {foo: ObservVarhash.Tombstone})
+  t.same(changes[0]._diff, {foo: undefined})
   t.same(obj(), {bar: 'bar'})
-  t.same(obj()._diff, {foo: ObservVarhash.Tombstone})
+  t.same(obj()._diff, {foo: undefined})
 
   t.end()
 })
@@ -264,7 +264,7 @@ test('Tombstone is Tombstone', function (t) {
   obj(function (change) {
     if (i <= 1) return i++
 
-    t.equal(change._diff.foo, ObservVarhash.Tombstone)
+    t.equal(change._diff.foo, undefined)
     t.end()
   })
 
