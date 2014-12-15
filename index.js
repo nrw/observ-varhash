@@ -63,7 +63,7 @@ function put (createValue, key, val) {
     throw new Error('cannot varhash.put(key, undefined).')
   }
 
-  var observ = typeof observ === 'function' ?
+  var observ = typeof val === 'function' ?
     createValue(val, key) : val
   var state = extend(this())
 
