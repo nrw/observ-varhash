@@ -1,6 +1,6 @@
 {
   "name": "observ-varhash",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An object with observable key value pairs that can be added and removed",
   "keywords": [],
   "author": "Nicholas Westlake <nicholasredlin@gmail.com>",
