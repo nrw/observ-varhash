@@ -157,6 +157,35 @@ test('supports both observs and values', function (t) {
   t.end()
 })
 
+test('createValue function can create observs where required', function(t) {
+  var obj = ObservVarhash({ foo: 'foo', bar: 'bar' }, function(item) {
+    return Observ(item);
+  });
+
+  t.equal(typeof obj.foo, 'function')
+  t.equal(obj.foo(), 'foo')
+  t.equal(typeof obj.bar, 'function')
+  t.equal(obj.bar(), 'bar')
+
+  t.end()
+});
+
+test('createValue function can create observs where required (via put)', function(t) {
+  var obj = ObservVarhash({}, function(item) {
+    return Observ(item);
+  });
+
+  obj.put('foo', 'foo');
+  obj.put('bar', 'bar');
+
+  t.equal(typeof obj.foo, 'function')
+  t.equal(obj.foo(), 'foo')
+  t.equal(typeof obj.bar, 'function')
+  t.equal(obj.bar(), 'bar')
+
+  t.end()
+});
+
 test('works with nested things', function (t) {
   var obj = ObservVarhash({
     fruits: ObservVarhash({
