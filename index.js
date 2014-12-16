@@ -64,7 +64,7 @@ function put (createValue, key, val) {
   }
 
   var observ = typeof val === 'function' ?
-    createValue(val, key) : val
+    val : createValue(val, key)
   var state = extend(this())
 
   state[key] = isFn(observ) ? observ() : observ
