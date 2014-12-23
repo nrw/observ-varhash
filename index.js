@@ -19,7 +19,7 @@ function ObservVarhash (hash, createValue) {
   setNonEnumerable(obs, 'put', put.bind(obs, createValue))
   setNonEnumerable(obs, 'delete', del.bind(obs))
 
-  for (key in hash) {
+  for (var key in hash) {
     obs[key] = typeof hash[key] === 'function' ?
       hash[key] : createValue(hash[key], key)
 
@@ -32,7 +32,7 @@ function ObservVarhash (hash, createValue) {
   for (key in hash) {
     var observ = obs[key]
     checkKey(key)
-    newState[key] = observ()
+    newState[key] = isFn(observ) ? observ() : observ
   }
   obs.set(newState)
 
