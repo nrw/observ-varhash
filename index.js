@@ -11,12 +11,6 @@ function ObservVarhash (hash, createValue) {
   var initialState = {}
   var currentTransaction = NO_TRANSACTION
 
-  for (var key in hash) {
-    var observ = hash[key]
-    checkKey(key)
-    initialState[key] = isFn(observ) ? observ() : observ
-  }
-
   var obs = Observ(initialState)
   setNonEnumerable(obs, '_removeListeners', {})
 
@@ -33,6 +27,14 @@ function ObservVarhash (hash, createValue) {
       obs._removeListeners[key] = obs[key](watch(obs, key, currentTransaction))
     }
   }
+
+  var newState = {}
+  for (key in hash) {
+    var observ = obs[key]
+    checkKey(key)
+    newState[key] = observ()
+  }
+  obs.set(newState)
 
   obs(function (newState) {
     if (currentTransaction === newState) {
