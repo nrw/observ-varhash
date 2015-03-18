@@ -139,7 +139,7 @@ var blacklist = {
   name: 'Clashes with `Function.prototype.name`.',
   get: 'get is a reserved key of observ-varhash method',
   put: 'put is a reserved key of observ-varhash method',
-  delete: 'delete is a reserved key of observ-varhash method',
+  'delete': 'delete is a reserved key of observ-varhash method',
   _diff: '_diff is a reserved key of observ-varhash method',
   _removeListeners: '_removeListeners is a reserved key of observ-varhash'
 }
