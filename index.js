@@ -16,7 +16,7 @@ function ObservVarhash (hash, createValue) {
 
   setNonEnumerable(obs, 'set', obs.set)
   setNonEnumerable(obs, 'get', get.bind(obs))
-  setNonEnumerable(obs, 'put', put.bind(obs, createValue))
+  setNonEnumerable(obs, 'put', put.bind(obs, createValue, currentTransaction))
   setNonEnumerable(obs, 'delete', del.bind(obs))
 
   for (var key in hash) {
@@ -58,7 +58,7 @@ function get (key) {
   return this[key]
 }
 
-function put (createValue, key, val) {
+function put (createValue, currentTransaction, key, val) {
   checkKey(key)
 
   if (val === undefined) {
@@ -76,7 +76,7 @@ function put (createValue, key, val) {
   }
 
   this._removeListeners[key] = isFn(observ) ?
-    observ(watch(this, key)) : null
+    observ(watch(this, key, currentTransaction)) : null
 
   setNonEnumerable(state, '_diff', diff(key, state[key]))
 
