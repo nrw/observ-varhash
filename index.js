@@ -20,8 +20,7 @@ function ObservVarhash (hash, createValue) {
   setNonEnumerable(obs, 'delete', del.bind(obs))
 
   for (var key in hash) {
-    obs[key] = typeof hash[key] === 'function' ?
-      hash[key] : createValue(hash[key], key)
+    obs[key] = isFn(hash[key]) ? hash[key] : createValue(hash[key], key)
 
     if (isFn(obs[key])) {
       obs._removeListeners[key] = obs[key](watch(obs, key, currentTransaction))
@@ -65,8 +64,7 @@ function put (createValue, currentTransaction, key, val) {
     throw new Error('cannot varhash.put(key, undefined).')
   }
 
-  var observ = typeof val === 'function' ?
-    val : createValue(val, key)
+  var observ = isFn(val) ? val : createValue(val, key)
   var state = extend(this())
 
   state[key] = isFn(observ) ? observ() : observ
@@ -125,7 +123,7 @@ function isFn (obj) {
   return typeof obj === 'function'
 }
 
-function setNonEnumerable(object, key, value) {
+function setNonEnumerable (object, key, value) {
   Object.defineProperty(object, key, {
     value: value,
     writable: true,
