@@ -327,6 +327,10 @@ test('supports two way data binding', function (t) {
   t.equal(obs().foo, 'bar3')
   t.equal(obs.foo(), 'bar3')
 
+  t.same(obs(), {
+    foo: 'bar3'
+  })
+
   t.end()
 })
 
