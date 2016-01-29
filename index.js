@@ -29,16 +29,15 @@ function ObservVarhash (hash, createValue) {
 
   var _set = obs.set
 
-  obs.set = function trackDiff(value) {
+  obs.set = function trackDiff (value) {
+    if (currentTransaction === value) {
+      return _set(value)
+    }
 
-      if (currentTransaction === value) {
-         return _set(value)
-      }
+    var newState = extend(value)
+    setNonEnumerable(newState, '_diff', value)
 
-      var newState = extend(value)
-      setNonEnumerable(newState, "_diff", value)
-
-      _set(newState)
+    _set(newState)
   }
 
   var newState = {}
@@ -59,11 +58,9 @@ function ObservVarhash (hash, createValue) {
       var newObservValue = newState[key]
 
       if (isFn(observ) && observ() !== newState[key]) {
-
         nestedTransaction = newObservValue
         observ.set(newState[key])
         nestedTransaction = NO_TRANSACTION
-
       }
     }
   })
@@ -74,27 +71,27 @@ function ObservVarhash (hash, createValue) {
     if (val === undefined) {
       throw new Error('cannot varhash.put(key, undefined).')
     }
-  
+
     var observ = isFn(val) ? val : createValue(val, key)
     var state = extend(this())
-  
+
     state[key] = isFn(observ) ? observ() : observ
-  
+
     if (isFn(this._removeListeners[key])) {
       this._removeListeners[key]()
     }
-  
-    this._removeListeners[key] = isFn(observ) ?
-      observ(watch(this, key)) : null
-  
+
+    this._removeListeners[key] = isFn(observ)
+      ? observ(watch(this, key)) : null
+
     setNonEnumerable(state, '_diff', diff(key, state[key]))
-  
+
     this[key] = observ
 
     currentTransaction = state
     _set(state)
     currentTransaction = NO_TRANSACTION
-  
+
     return this
   }
 
@@ -103,14 +100,14 @@ function ObservVarhash (hash, createValue) {
     if (isFn(this._removeListeners[key])) {
       this._removeListeners[key]()
     }
-  
+
     delete this._removeListeners[key]
     delete state[key]
     delete this[key]
-  
+
     setNonEnumerable(state, '_diff', diff(key, undefined))
     _set(state)
-  
+
     return this
   }
 
@@ -119,14 +116,13 @@ function ObservVarhash (hash, createValue) {
   // processing
   function watch (obs, key) {
     return function (value) {
-
-      if(nestedTransaction === value) {
-          return
+      if (nestedTransaction === value) {
+        return
       }
 
       var state = extend(obs())
       state[key] = value
-  
+
       setNonEnumerable(state, '_diff', diff(key, value))
 
       currentTransaction = state

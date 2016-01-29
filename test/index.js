@@ -353,25 +353,24 @@ test('two way data binding doesnt emit twice', function (t) {
   t.end()
 })
 
-test("support plain values", function t(assert) {
-    var obs = ObservVarhash({
-        foo: Observ("bar"),
-        baz: "plain value"
-    })
+test('support plain values', function (t) {
+  var obs = ObservVarhash({
+    foo: Observ('bar'),
+    baz: 'plain value'
+  })
 
-    obs.set({ foo: "bar2", baz: "plain value" })
+  obs.set({ foo: 'bar2', baz: 'plain value' })
 
-    assert.equal(obs().foo, "bar2")
-    assert.equal(obs().baz, "plain value")
-    assert.equal(obs.foo(), "bar2")
+  t.equal(obs().foo, 'bar2')
+  t.equal(obs().baz, 'plain value')
+  t.equal(obs.foo(), 'bar2')
 
-    assert.end()
+  t.end()
 })
 
-test("_diff is correct with 2way bind", function t(assert) {
-
+test('_diff is correct with two-way bind', function (t) {
   var obs = ObservVarhash({
-    foo: Observ("bar")
+    foo: Observ('bar')
   })
 
   var values = []
@@ -380,21 +379,17 @@ test("_diff is correct with 2way bind", function t(assert) {
     values.push(v)
   })
 
-  obs.set({ foo: "bar2" })
+  obs.set({ foo: 'bar2' })
 
-  assert.equal(obs().foo, "bar2")
-  assert.equal(obs.foo(), "bar2")
+  t.equal(obs().foo, 'bar2')
+  t.equal(obs.foo(), 'bar2')
 
-  assert.equal(values.length, 1)
-  assert.deepEqual(values[0], {
-    foo: "bar2"
+  t.equal(values.length, 1)
+  t.deepEqual(values[0], {
+    foo: 'bar2'
   })
 
-  assert.deepEqual(values[0]._diff, { foo: "bar2" })
+  t.deepEqual(values[0]._diff, { foo: 'bar2' })
 
-  assert.end()
-
+  t.end()
 })
-
-
-
