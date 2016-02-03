@@ -39,6 +39,7 @@ function ObservVarhash (hash, createValue) {
 
     _set(newState)
   }
+  setNonEnumerable(obs, 'set', obs.set)
 
   var newState = {}
   for (key in hash) {
